@@ -212,6 +212,41 @@ def mcp_endpoint(request: MCPRequest):
                 "errorCode": resp.status_code,
                 "errorMessage": resp.text
             }
+    # ------------------------------------
+    # Composite Action: Read both Skills and Interests
+    # ------------------------------------
+    elif action == "readUserProfileSkillsAndInterests":
+        user_id = data.get("userId")
+        skills_url = f"https://graph.microsoft.com/beta/users/{user_id}/profile/skills"
+        interests_url = f"https://graph.microsoft.com/beta/users/{user_id}/profile/interests"
+
+        skills_resp = requests.get(skills_url, headers=headers)
+        interests_resp = requests.get(interests_url, headers=headers)
+
+        if skills_resp.status_code == 200 and interests_resp.status_code == 200:
+            return {
+                "status": "success",
+                "action": action,
+                "contextId": context_id,
+                "data": {
+                    "skills": skills_resp.json().get("value", []),
+                    "interests": interests_resp.json().get("value", [])
+                }
+            }
+        else:
+            return {
+                "status": "error",
+                "action": action,
+                "contextId": context_id,
+                "errorCode": {
+                    "skillsStatus": skills_resp.status_code,
+                    "interestsStatus": interests_resp.status_code
+                },
+                "errorMessage": {
+                    "skillsError": skills_resp.text,
+                    "interestsError": interests_resp.text
+                }
+            }
 
     # ------------------------------------
     # Default fallback if action not recognized

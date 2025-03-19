@@ -84,7 +84,7 @@ curl -X POST http://localhost:8000/mcp \
       }'
 ```
 
-## update existing interests in a User Profile
+## Update existing interests in a User Profile
 
 ```bash
 curl -X POST http://localhost:8000/mcp \
